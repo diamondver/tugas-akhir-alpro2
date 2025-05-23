@@ -13,6 +13,9 @@ func Bootstrap() {
 	// Configuration
 	config.GetEnvConfig()
 
+	// Dependency Injection
+	container := config.DependencyConfig()
+
 	for true {
 
 	}
