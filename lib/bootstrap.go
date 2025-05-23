@@ -17,6 +17,6 @@ func Bootstrap() {
 	container := config.DependencyConfig()
 
 	for true {
-
+		container.MainController.MainMenu()
 	}
 }

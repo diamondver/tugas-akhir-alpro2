@@ -1,6 +1,8 @@
 package controllers
 
-import "tugas-besar/lib/services"
+import (
+	"tugas-besar/lib/services"
+)
 
 // MainController handles application requests and delegates operations to the main service.
 // It implements the controller logic for main functionality of the application.
@@ -20,4 +22,8 @@ func NewMainController(service services.MainService) *MainController {
 	return &MainController{
 		mainService: service,
 	}
+}
+
+func (c *MainController) MainMenu() {
+	c.mainService.MainMenu()
 }
