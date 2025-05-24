@@ -1,6 +1,9 @@
 package lib
 
-import "tugas-besar/lib/config"
+import (
+	"fmt"
+	"tugas-besar/lib/config"
+)
 
 // Bootstrap initializes the application by loading environment configurations.
 // It calls config.GetEnvConfig() to load environment variables from the .env file.
@@ -10,6 +13,8 @@ import "tugas-besar/lib/config"
 //
 // The function does not accept any parameters and does not return any values.
 func Bootstrap() {
+	var result string
+
 	// Configuration
 	config.GetEnvConfig()
 
@@ -17,6 +22,13 @@ func Bootstrap() {
 	container := config.DependencyConfig()
 
 	for true {
+		container.MainController.MainMenu(&result)
 
+		switch result {
+		case "Exit":
+			break
+		}
 	}
+
+	fmt.Scanln()
 }
