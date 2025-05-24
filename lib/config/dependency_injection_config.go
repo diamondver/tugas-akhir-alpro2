@@ -2,6 +2,7 @@ package config
 
 import (
 	"tugas-besar/lib/controllers"
+	"tugas-besar/lib/repository"
 	"tugas-besar/lib/services"
 )
 
@@ -10,6 +11,7 @@ import (
 // properly configured controllers in the application.
 type AppContainer struct {
 	MainController *controllers.MainController
+	AuthController *controllers.AuthController
 }
 
 // DependencyConfig initializes and wires all application dependencies.
@@ -20,7 +22,13 @@ func DependencyConfig() *AppContainer {
 	mainService := services.NewMainService()
 	mainController := controllers.NewMainController(mainService)
 
+	userService := services.NewUserService(repository.NewUserRepository())
+
+	authService := services.NewAuthService(userService)
+	authController := controllers.NewAuthController(authService)
+
 	return &AppContainer{
 		MainController: mainController,
+		AuthController: authController,
 	}
 }
