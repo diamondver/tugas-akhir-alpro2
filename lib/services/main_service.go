@@ -26,6 +26,17 @@ func NewMainService() MainService {
 	return &mainServiceImpl{}
 }
 
+// MainMenu displays the main application menu and captures the user's choice.
+// It first clears the screen and displays a welcome banner before showing
+// an interactive menu with options for Login, Register, Admin, and Exit.
+//
+// Parameters:
+//   - chose: A pointer to a string where the selected menu option will be stored
+//
+// Returns:
+//   - error: nil on successful selection, or an error if the prompt operation fails
+//
+// The function uses color formatting and promptui for an enhanced user interface.
 func (*mainServiceImpl) MainMenu(chose *string) error {
 	helper.ClearScreen()
 	color.Yellow("=========================================")
