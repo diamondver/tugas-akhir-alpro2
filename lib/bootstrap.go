@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"tugas-besar/lib/config"
+	"tugas-besar/lib/model"
 )
 
 // Bootstrap initializes the application by loading environment configurations.
@@ -14,6 +15,7 @@ import (
 // The function does not accept any parameters and does not return any values.
 func Bootstrap() {
 	var result string
+	var user model.User
 
 	// Configuration
 	config.GetEnvConfig()
@@ -21,12 +23,18 @@ func Bootstrap() {
 	// Dependency Injection
 	container := config.DependencyConfig()
 
-	for true {
+	for {
 		container.MainController.MainMenu(&result)
 
-		switch result {
-		case "Exit":
+		if result == "Exit" {
 			break
+		}
+
+		switch result {
+		case "Login":
+			container.AuthController.Login(&user)
+		case "Register":
+			container.AuthController.Register()
 		}
 	}
 
