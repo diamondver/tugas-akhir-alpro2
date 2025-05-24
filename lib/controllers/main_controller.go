@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+	"github.com/fatih/color"
 	"tugas-besar/lib/services"
 )
 
@@ -24,6 +26,20 @@ func NewMainController(service services.MainService) *MainController {
 	}
 }
 
-func (c *MainController) MainMenu() {
-	c.mainService.MainMenu()
+// MainMenu displays the main menu of the application and captures the user's choice.
+// It delegates to the mainService to handle menu display and selection logic.
+//
+// Parameters:
+//   - result: A pointer to a string that will store the user's menu selection
+//
+// The function displays errors in red if any occur during menu operations
+// and waits for user acknowledgment by pressing Enter before returning.
+func (c *MainController) MainMenu(result *string) {
+	err := c.mainService.MainMenu(result)
+
+	if err != nil {
+		color.Red(err.Error())
+		fmt.Scanln()
+		return
+	}
 }

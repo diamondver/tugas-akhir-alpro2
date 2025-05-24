@@ -1,15 +1,15 @@
 package services
 
 import (
-	"fmt"
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
+	"tugas-besar/lib/helper"
 )
 
 // MainService defines the interface for the main operations of the application.
 // It abstracts the core business logic to allow for better testing and modularity.
 type MainService interface {
-	MainMenu()
+	MainMenu(chose *string) error
 }
 
 // mainServiceImpl implements the MainService interface with concrete business logic.
@@ -26,7 +26,8 @@ func NewMainService() MainService {
 	return &mainServiceImpl{}
 }
 
-func (*mainServiceImpl) MainMenu() {
+func (*mainServiceImpl) MainMenu(chose *string) error {
+	helper.ClearScreen()
 	color.Yellow("=========================================")
 	color.Yellow("=  Selamat datang di Tugas Besar Alpro  =")
 	color.Yellow("=       Aplikasi Analisis Sentimen      =")
@@ -47,9 +48,10 @@ func (*mainServiceImpl) MainMenu() {
 	_, result, err := prompt.Run()
 
 	if err != nil {
-		color.Red("Prompt failed %v\n", err)
-		return
+		return err
 	}
 
-	fmt.Println(result)
+	*chose = result
+
+	return nil
 }
