@@ -36,9 +36,21 @@ type CommentRepository interface {
 	// Categories are ranked as: Positif (1), Netral (0), Negatif (-1).
 	SortCommentsByKategori(comments *[255]model.Comment, mode int) error
 
+	// EditComment updates a comment with the specified ID.
+	// It searches through all comments to find a match with the specified commentId.
+	// Only fields that contain values in the provided comment model will be updated
+	// (empty strings are ignored).
+	EditComment(commentId int, comment model.Comment) error
+
 	// EditUserComment updates a comment that belongs to a specific user.
 	// Only allows editing if the comment exists and belongs to the specified user.
 	EditUserComment(commentId int, userId int, comment model.Comment) error
+
+	// DeleteComment removes a comment with the specified ID from the repository.
+	// It searches through all comments to find a match with the specified commentId.
+	// If found, it removes the comment by shifting all subsequent comments up by one
+	// position in the array and decrements the global comment count.
+	DeleteComment(commentId int) error
 
 	// DeleteUserComment removes a comment that belongs to a specific user.
 	// Only allows deletion if the comment exists and belongs to the specified user.
@@ -47,6 +59,12 @@ type CommentRepository interface {
 	// GetCommentByUserId retrieves all comments belonging to a specific user.
 	// It populates the provided comments array with all comments from the specified user.
 	GetCommentByUserId(userId int, comments *[255]model.Comment) error
+
+	// GetCommentByKategori retrieves all comments with the specified category.
+	// It iterates through all comments in the global storage and copies those
+	// that match the specified category to the provided array, maintaining
+	// their original index positions.
+	GetCommentByKategori(kategori string, comments *[255]model.Comment) (int, error)
 }
 
 // NewCommentRepository creates and returns a new CommentRepository implementation.
@@ -264,6 +282,37 @@ func (c *commentRepository) EditUserComment(commentId int, userId int, data mode
 	return fmt.Errorf("comment with ID %d not found or does not belong to user with ID %d", commentId, userId)
 }
 
+// EditComment updates a comment with the specified ID in the repository.
+// It iterates through all comments to find one that matches the provided commentId.
+// When found, it selectively updates only the non-empty fields from the provided
+// comment model (empty strings are ignored):
+// - Komentar field is updated if comment.Komentar is not empty
+// - Kategori field is updated if comment.Kategori is not empty
+//
+// Parameters:
+//   - commentId: The ID of the comment to edit
+//   - comment: The model.Comment containing fields to update
+//
+// Returns:
+//   - error: An error if the comment is not found, nil on success
+func (c *commentRepository) EditComment(commentId int, comment model.Comment) error {
+	for i := 0; i < global.CommentCount; i++ {
+		if global.Comments[i].Id == commentId {
+			if comment.Komentar != "" {
+				global.Comments[i].Komentar = comment.Komentar
+			}
+
+			if comment.Kategori != "" {
+				global.Comments[i].Kategori = comment.Kategori
+			}
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("comment with ID %d not found", commentId)
+}
+
 // GetCommentByUserId retrieves all comments belonging to a specific user.
 // It iterates through all comments in the global storage and copies those
 // that match the specified user ID to the provided array, maintaining
@@ -289,6 +338,30 @@ func (c *commentRepository) GetCommentByUserId(userId int, comments *[255]model.
 	return nil
 }
 
+// DeleteComment removes a comment with the specified ID from the repository.
+// It iterates through all comments to find the one with the matching commentId.
+// If found, it removes the comment by shifting all subsequent comments up by one
+// position in the array and decrements the global comment count.
+//
+// Parameters:
+//   - commentId: The ID of the comment to delete
+//
+// Returns:
+//   - error: An error if the comment is not found, nil on success
+func (c *commentRepository) DeleteComment(commentId int) error {
+	for i := 0; i < global.CommentCount; i++ {
+		if global.Comments[i].Id == commentId {
+			for j := i; j < global.CommentCount-1; j++ {
+				global.Comments[j] = global.Comments[j+1]
+			}
+			global.CommentCount--
+			return nil
+		}
+	}
+
+	return fmt.Errorf("comment with ID %d not found", commentId)
+}
+
 // DeleteUserComment removes a comment that belongs to a specific user.
 // It first searches for a comment with the matching commentId that also belongs to the specified userId.
 // If found, it removes the comment by shifting all subsequent comments up by one position in the array
@@ -312,4 +385,33 @@ func (c *commentRepository) DeleteUserComment(commentId int, userId int) error {
 	}
 
 	return fmt.Errorf("comment with ID %d not found or does not belong to user with ID %d", commentId, userId)
+}
+
+// GetCommentByKategori retrieves all comments with the specified category.
+// It iterates through all comments in the global storage and copies those
+// that match the specified category to the provided array, maintaining
+// their original index positions.
+//
+// Note: This implementation preserves the original index positions of comments,
+// which may result in sparse population of the results array if comments
+// with the matching category are not contiguous in the global storage.
+//
+// Parameters:
+//   - kategori: The category to filter comments by (e.g., "Positif", "Netral", "Negatif")
+//   - comments: A pointer to an array that will be filled with the matching comments
+//
+// Returns:
+//   - int: The count of comments matching the specified category
+//   - error: Always returns nil as this implementation doesn't have failure cases
+func (c *commentRepository) GetCommentByKategori(kategori string, comments *[255]model.Comment) (int, error) {
+	var j int
+
+	for i := 0; i < global.CommentCount; i++ {
+		if global.Comments[i].Kategori == kategori {
+			j++
+			(*comments)[i] = global.Comments[i]
+		}
+	}
+
+	return j, nil
 }

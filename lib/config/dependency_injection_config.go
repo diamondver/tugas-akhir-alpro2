@@ -32,7 +32,7 @@ func DependencyConfig() *AppContainer {
 	userController := controllers.NewUserController(userService)
 	commentController := controllers.NewCommentController(commentService)
 
-	adminService := services.NewAdminService(userService)
+	adminService := services.NewAdminService(userService, commentService, repository.NewCommentRepository())
 	adminController := controllers.NewAdminController(adminService)
 
 	return &AppContainer{
@@ -40,6 +40,6 @@ func DependencyConfig() *AppContainer {
 		AuthController:    authController,
 		UserController:    userController,
 		CommentController: commentController,
-		AdminController: adminController,
+		AdminController:   adminController,
 	}
 }
