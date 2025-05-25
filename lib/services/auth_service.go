@@ -152,7 +152,7 @@ func (service *authService) Register() error {
 		IsConfirm: true,
 	}
 
-	if service.userService.IsUserExists(username) {
+	if service.userService.IsUserExists(username, -1) {
 		color.Red("User with username %s already exists", username)
 		_, err = askPrompt.Run()
 		if err != nil {

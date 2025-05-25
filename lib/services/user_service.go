@@ -19,7 +19,20 @@ type UserService interface {
 
 	// IsUserExists checks if a user with the specified username exists.
 	// Returns true if a user with the given username exists, false otherwise.
-	IsUserExists(username string) bool
+	IsUserExists(username string, exceptId int) bool
+
+	// GetAllUsers retrieves all users stored in the system.
+	GetAllUsers(*[255]model.User) error
+
+	// SearchUsers finds users whose usernames contain the search string.
+	SearchUsers(search string, users *[255]model.User) error
+
+	// EditUser updates a user's information at the specified index.
+	// Only non-empty fields in data will overwrite existing values.
+	EditUser(index int, data model.User) error
+
+	// DeleteUser removes a user from the system.
+	DeleteUser(id int) error
 }
 
 // userService implements the UserService interface.
@@ -74,6 +87,57 @@ func (userService *userService) FindUserByUsername(username string, user *model.
 //
 // Returns:
 //   - bool: true if a user with the given username exists, false otherwise
-func (userService *userService) IsUserExists(username string) bool {
-	return userService.userRepo.IsUserExists(username)
+func (userService *userService) IsUserExists(username string, exceptId int) bool {
+	return userService.userRepo.IsUserExists(username, exceptId)
+}
+
+// GetAllUsers retrieves all users stored in the system.
+// It delegates the retrieval operation to the underlying repository.
+//
+// Parameters:
+//   - users: A pointer to an array that will be populated with all user data
+//
+// Returns:
+//   - error: An error if the retrieval fails, nil otherwise
+func (userService *userService) GetAllUsers(users *[255]model.User) error {
+	return userService.userRepo.GetAllUsers(users)
+}
+
+// SearchUsers finds users whose usernames contain the search string.
+// It delegates the search operation to the underlying repository.
+//
+// Parameters:
+//   - search: The substring to search for in usernames
+//   - users: A pointer to an array that will be populated with matching users
+//
+// Returns:
+//   - error: An error if the search fails, nil otherwise
+func (userService *userService) SearchUsers(search string, users *[255]model.User) error {
+	return userService.userRepo.SearchUsers(search, users)
+}
+
+// EditUser updates a user's information at the specified index.
+// It delegates the update operation to the underlying repository.
+// Only non-empty fields in data will overwrite existing values.
+//
+// Parameters:
+//   - index: The index of the user to update
+//   - data: User model containing the fields to update
+//
+// Returns:
+//   - error: An error if the update fails or index is invalid, nil otherwise
+func (userService *userService) EditUser(index int, data model.User) error {
+	return userService.userRepo.EditUser(index, data)
+}
+
+// DeleteUser removes a user from the system.
+// It delegates the deletion operation to the underlying repository.
+//
+// Parameters:
+//   - id: The index of the user to remove
+//
+// Returns:
+//   - error: An error if the deletion fails or id is invalid, nil otherwise
+func (userService *userService) DeleteUser(id int) error {
+	return userService.userRepo.DeleteUser(id)
 }
