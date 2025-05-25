@@ -127,12 +127,12 @@ func (service *authService) Register() error {
 		return err
 	}
 
-	if service.userService.IsUserExists(username) {
+	if service.userService.IsUserExists(username, -1) {
 		return fmt.Errorf("user with username %s already exists", username)
 	}
 
 	if password != confirmPassword {
-		return fmt.Errorf("passwords do not match")
+		return fmt.Errorf("password does not match")
 	}
 
 	err = service.userService.CreateUser(&model.User{
