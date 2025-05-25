@@ -1,8 +1,12 @@
 package services
 
 import (
+	"tugas-besar/lib/helper"
 	"tugas-besar/lib/model"
 	"tugas-besar/lib/repository"
+
+	"github.com/fatih/color"
+	"github.com/manifoldco/promptui"
 )
 
 // UserService defines the interface for user management operations.
@@ -20,6 +24,11 @@ type UserService interface {
 	// IsUserExists checks if a user with the specified username exists.
 	// Returns true if a user with the given username exists, false otherwise.
 	IsUserExists(username string, exceptId int) bool
+
+	// UserPage displays the user menu interface and captures the user's selection.
+	// It presents a menu with options for comment management (add/view/edit/delete)
+	// and stores the selected option in the provided parameter.
+	UserPage(chose *string) error
 
 	// GetAllUsers retrieves all users stored in the system.
 	GetAllUsers(*[255]model.User) error
@@ -52,6 +61,44 @@ func NewUserService(userRepo repository.UserRepository) UserService {
 	return &userService{
 		userRepo: userRepo,
 	}
+}
+
+// UserPage displays the user menu interface and captures the user's selection.
+// It clears the screen, displays a formatted menu header, and presents
+// interactive options for comment management (add/view/edit/delete).
+// The user's selection is stored in the provided parameter.
+//
+// Parameters:
+//   - chose: A pointer to a string that will store the user's menu selection
+//
+// Returns:
+//   - error: An error if displaying the menu or capturing the selection fails, nil on success
+func (userService *userService) UserPage(chose *string) error {
+	helper.ClearScreen()
+	color.Yellow("* MENU > USER")
+	color.Yellow("========================================")
+	color.Yellow("=               MENU USER              =")
+	color.Yellow("========================================")
+
+	prompt := promptui.Select{
+		Label: "Pilih Menu",
+		Items: []string{"Tambah Komentar", "Lihat Komentar", "Edit Komentar", "Delete Komentar", "Exit"},
+		Templates: &promptui.SelectTemplates{
+			Label:    "{{ . | blue }}:",
+			Active:   "\u27A1 {{ . | cyan }}",
+			Inactive: "  {{ . | cyan }}",
+			Selected: "\u2705 {{ . | blue | cyan }}",
+		},
+	}
+
+	_, result, err := prompt.Run()
+	if err != nil {
+		return err
+	}
+
+	*chose = result
+
+	return nil
 }
 
 // CreateUser adds a new user to the system.

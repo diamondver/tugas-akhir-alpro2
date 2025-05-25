@@ -257,10 +257,18 @@ func (service *adminService) SearchUsers() error {
 	color.Yellow("=              DATA USER               =")
 	color.Yellow("========================================")
 
-	err = service.ShowUserTable()
-	if err != nil {
-		return err
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"#", "Username"})
+	var j int
+	for i := 0; i < global.UserCount; i++ {
+		if users[i].Username != "" {
+			j++
+			t.AppendRow(table.Row{j, users[i].Username})
+		}
 	}
+	t.SetStyle(table.StyleColoredBright)
+	t.Render()
 
 	_, err = askPrompt.Run()
 	if err != nil {
