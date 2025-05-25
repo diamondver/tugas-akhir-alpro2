@@ -45,8 +45,13 @@ func NewUserRepository() UserRepository {
 // Returns:
 //   - error: Always returns nil as this implementation doesn't have failure cases
 func (repo *userRepository) Create(user *model.User) error {
-	global.Users[global.UserCount] = *user
+	global.Users[global.UserCount] = model.User{
+		Id:       global.IdUserIncrement + 1,
+		Username: user.Username,
+		Password: user.Password,
+	}
 	global.UserCount++
+	global.IdUserIncrement++
 
 	return nil
 }

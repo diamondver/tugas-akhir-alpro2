@@ -1,11 +1,17 @@
 package model
 
-// User represents a user entity in the system.
+// Comment represents a user entity in the system.
 // It contains basic identification and authentication information.
 type Comment struct {
-	// komentar is the text content of the comment.
-	komentar string `json:"komentar"`
+	// Id is the unique identifier for the comment.
+	Id int `json:"id"`
 
-	// kategori is the category or topic of the comment.
-	kategori string `json:"kategori"`
+	// UserId is the unique identifier for the user who made the comment.
+	UserId int `json:"user_id"`
+
+	// Komentar is the text content of the comment.
+	Komentar string `json:"komentar"`
+
+	// Kategori is the category or topic of the comment.
+	Kategori string `json:"kategori"`
 }

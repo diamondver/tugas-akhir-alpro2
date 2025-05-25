@@ -32,8 +32,31 @@ func Bootstrap() {
 		switch result {
 		case "Login":
 			container.AuthController.Login(&user)
-			container.UserController.UserPage(&result)
-			container.CommentController.CommentInputPage(&result)
+			if user.Username != "" {
+				for {
+					err := container.UserController.UserPage(&result)
+					if err != nil {
+						break
+					}
+
+					if result == "Exit" {
+						user.Username = ""
+						user.Password = ""
+						break
+					}
+
+					switch result {
+					case "Tambah Komentar":
+						container.CommentController.CommentInputPage(user)
+					case "Lihat Komentar":
+						container.CommentController.CommentView()
+					case "Edit Komentar":
+						container.CommentController.EditComment(user)
+					case "Delete Komentar":
+						container.CommentController.DeleteComment(user)
+					}
+				}
+			}
 		case "Register":
 			container.AuthController.Register()
 		}
