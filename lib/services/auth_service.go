@@ -64,14 +64,34 @@ func (service *authService) Login(user *model.User) error {
 		return err
 	}
 
+	askPrompt := promptui.Prompt{
+		Label:     "Do you want to try again?",
+		IsConfirm: true,
+	}
+
 	err = service.userService.FindUserByUsername(username, user)
 	if err != nil {
-		return err
+		color.Red("User not found: %s", username)
+		_, err = askPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("back")
+		}
+
+		return fmt.Errorf("continue")
 	}
 
 	if user.Password != password {
-		return fmt.Errorf("incorrect password")
+		color.Red("Password does not match")
+		_, err = askPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("back")
+		}
+
+		return fmt.Errorf("continue")
 	}
+
+	color.Green("Login successful! Welcome, %s!", user.Username)
+	fmt.Scanln()
 
 	return nil
 }
@@ -127,12 +147,29 @@ func (service *authService) Register() error {
 		return err
 	}
 
+	askPrompt := promptui.Prompt{
+		Label:     "Do you want to try again?",
+		IsConfirm: true,
+	}
+
 	if service.userService.IsUserExists(username, -1) {
-		return fmt.Errorf("user with username %s already exists", username)
+		color.Red("User with username %s already exists", username)
+		_, err = askPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("back")
+		}
+
+		return fmt.Errorf("continue")
 	}
 
 	if password != confirmPassword {
-		return fmt.Errorf("password does not match")
+		color.Red("Password does not match")
+		_, err = askPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("back")
+		}
+
+		return fmt.Errorf("continue")
 	}
 
 	err = service.userService.CreateUser(&model.User{
