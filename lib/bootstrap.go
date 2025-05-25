@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"tugas-besar/lib/config"
 	"tugas-besar/lib/model"
 )
@@ -33,10 +32,11 @@ func Bootstrap() {
 		switch result {
 		case "Login":
 			container.AuthController.Login(&user)
+			container.UserController.UserPage(&result)
+			container.CommentController.CommentInputPage(&result)
 		case "Register":
 			container.AuthController.Register()
 		}
 	}
 
-	fmt.Scanln()
 }

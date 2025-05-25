@@ -1,8 +1,12 @@
 package services
 
 import (
+	"tugas-besar/lib/helper"
 	"tugas-besar/lib/model"
 	"tugas-besar/lib/repository"
+
+	"github.com/fatih/color"
+	"github.com/manifoldco/promptui"
 )
 
 // UserService defines the interface for user management operations.
@@ -20,6 +24,8 @@ type UserService interface {
 	// IsUserExists checks if a user with the specified username exists.
 	// Returns true if a user with the given username exists, false otherwise.
 	IsUserExists(username string) bool
+
+	UserPage(chose *string) error
 }
 
 // userService implements the UserService interface.
@@ -76,4 +82,32 @@ func (userService *userService) FindUserByUsername(username string, user *model.
 //   - bool: true if a user with the given username exists, false otherwise
 func (userService *userService) IsUserExists(username string) bool {
 	return userService.userRepo.IsUserExists(username)
+}
+
+func (*userService) userPage(chose *string) error {
+	helper.ClearScreen()
+	color.Yellow("========================================")
+	color.Yellow("=                MENU                  =")
+	color.Yellow("========================================")
+
+	prompt := promptui.Select{
+		Label: "Pilih Menu",
+		Items: []string{"Input Komentar", "Lihat Komentar", "Cari Komentar", "Lihat User", "Exit"},
+		Templates: &promptui.SelectTemplates{
+			Label:    "{{ . | blue }}:",
+			Active:   "\u27A1 {{ . | cyan }}",
+			Inactive: "  {{ . | cyan }}",
+			Selected: "\u2705 {{ . | blue | cyan }}",
+		},
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		return err
+	}
+
+	*chose = result
+
+	return nil
 }
