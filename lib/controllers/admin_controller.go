@@ -68,6 +68,14 @@ func (c *AdminController) AdminMenu() {
 		switch result {
 		case "Lihat User":
 			c.adminLihatUser()
+		case "Lihat Komentar":
+			c.LihatComment()
+		case "Lihat Grafik":
+			err := c.adminService.Grafik()
+			if err != nil {
+				color.Red(err.Error())
+				fmt.Scanln()
+			}
 		}
 	}
 }
@@ -249,6 +257,227 @@ func (c *AdminController) DeleteUser() {
 		}
 
 		color.Green("User deleted successfully!")
+		fmt.Scanln()
+		break
+	}
+}
+
+// LihatComment handles the comment management menu in the admin interface.
+//
+// It displays a menu for managing comments through the admin service and processes
+// the user's selection in a continuous loop until "Exit" is chosen.
+//
+// The method supports the following operations:
+// - "Search": Search for comments
+// - "Add": Create a new comment
+// - "Edit": Modify an existing comment
+// - "Delete": Remove a comment
+// - "Sorting": Sort comments
+// - "Exit": Return to the previous menu
+//
+// Any errors encountered while displaying the menu are shown to the user in red text.
+// The function handles navigation between different comment management functions based on
+// the selected option.
+func (c *AdminController) LihatComment() {
+	var result string
+
+	for {
+		err := c.adminService.LihatComment(&result)
+		if err != nil {
+			color.Red(err.Error())
+			continue
+		}
+
+		if result == "Exit" {
+			break
+		}
+
+		switch result {
+		case "Search":
+			c.SearchComment()
+		case "Add":
+			c.AddComment()
+		case "Edit":
+			c.EditComment()
+		case "Delete":
+			c.DeleteComment()
+		case "Sorting":
+			c.SortingComment()
+		}
+	}
+}
+
+// SearchComment handles the comment search functionality in the admin interface.
+//
+// It runs in a continuous loop, calling the SearchAdminComment method from the admin service
+// until a terminating condition is met. The function processes different error types:
+//
+// Error handling:
+//   - "back": Returns to the previous menu
+//   - "continue": Restarts the search process
+//   - Other errors: Displays the error message in red text, waits for user input,
+//     and returns to the previous menu
+//
+// The function terminates when either a "back" error is received, a non-"continue"
+// error occurs, or when the SearchAdminComment method completes successfully.
+func (c *AdminController) SearchComment() {
+	for {
+		err := c.adminService.SearchAdminComment()
+		if err != nil {
+			if err.Error() == "back" {
+				break
+			}
+
+			if err.Error() == "continue" {
+				continue
+			}
+
+			color.Red(err.Error())
+			fmt.Scanln()
+			break
+		}
+	}
+}
+
+// AddComment handles the comment creation functionality in the admin interface.
+//
+// It runs in a continuous loop, calling the AddComment method from the admin service
+// until a terminating condition is met. The function processes different error types:
+//
+// Error handling:
+//   - "back": Returns to the previous menu
+//   - "continue": Restarts the comment creation process
+//   - Other errors: Displays the error message in red text, waits for user input,
+//     and returns to the previous menu
+//
+// On successful comment creation, the function displays a success message in green,
+// waits for user input, and returns to the previous menu.
+func (c *AdminController) AddComment() {
+	for {
+		err := c.adminService.AddComment()
+		if err != nil {
+			if err.Error() == "back" {
+				break
+			}
+
+			if err.Error() == "continue" {
+				continue
+			}
+
+			color.Red(err.Error())
+			fmt.Scanln()
+			break
+		}
+
+		color.Green("Comment added successfully!")
+		fmt.Scanln()
+		break
+	}
+}
+
+// EditComment handles the comment editing functionality in the admin interface.
+//
+// It runs in a continuous loop, calling the EditComment method from the admin service
+// until a terminating condition is met. The function processes different error types:
+//
+// Error handling:
+//   - "back": Returns to the previous menu
+//   - "continue": Restarts the comment editing process
+//   - Other errors: Displays the error message in red text, waits for user input,
+//     and returns to the previous menu
+//
+// On successful comment editing, the function displays a success message in green,
+// waits for user input, and returns to the previous menu.
+func (c *AdminController) EditComment() {
+	for {
+		err := c.adminService.EditComment()
+		if err != nil {
+			if err.Error() == "back" {
+				break
+			}
+
+			if err.Error() == "continue" {
+				continue
+			}
+
+			color.Red(err.Error())
+			fmt.Scanln()
+			break
+		}
+
+		color.Green("Comment edited successfully!")
+		fmt.Scanln()
+		break
+	}
+}
+
+// DeleteComment handles the comment deletion functionality in the admin interface.
+//
+// It runs in a continuous loop, calling the DeleteComment method from the admin service
+// until a terminating condition is met. The function processes different error types:
+//
+// Error handling:
+//   - "back": Returns to the previous menu
+//   - "continue": Restarts the comment deletion process
+//   - Other errors: Displays the error message in red text, waits for user input,
+//     and returns to the previous menu
+//
+// On successful comment deletion, the function displays a success message in green,
+// waits for user input, and returns to the previous menu.
+func (c *AdminController) DeleteComment() {
+	for {
+		err := c.adminService.DeleteComment()
+		if err != nil {
+			if err.Error() == "back" {
+				break
+			}
+
+			if err.Error() == "continue" {
+				continue
+			}
+
+			color.Red(err.Error())
+			fmt.Scanln()
+			break
+		}
+
+		color.Green("Comment deleted successfully!")
+		fmt.Scanln()
+		break
+	}
+}
+
+// SortingComment handles the comment sorting functionality in the admin interface.
+//
+// It runs in a continuous loop, calling the SortingKomentar method from the admin service
+// until a terminating condition is met. The function processes different error types:
+//
+// Error handling:
+//   - "back": Returns to the previous menu
+//   - "continue": Restarts the sorting process
+//   - Other errors: Displays the error message in red text, waits for user input,
+//     and returns to the previous menu
+//
+// On successful comment sorting, the function displays a success message in green,
+// waits for user input, and returns to the previous menu.
+func (c *AdminController) SortingComment() {
+	for {
+		err := c.adminService.SortingKomentar()
+		if err != nil {
+			if err.Error() == "back" {
+				break
+			}
+
+			if err.Error() == "continue" {
+				continue
+			}
+
+			color.Red(err.Error())
+			fmt.Scanln()
+			break
+		}
+
+		color.Green("Comments sorted successfully!")
 		fmt.Scanln()
 		break
 	}

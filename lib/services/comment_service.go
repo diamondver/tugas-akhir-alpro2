@@ -53,9 +53,31 @@ type CommentService interface {
 	// It displays a list of the user's comments, prompts for the ID of the comment
 	// to delete, and removes the selected comment from the system.
 	DeleteUserComment(user model.User) error
+
+	// ShowTable retrieves and displays all comments in a formatted table.
+	// It queries the repository for all comments and renders them in a table
+	// with columns for comment number, ID, text content, and category.
+	// The table is formatted with colored styling for better readability.
+	ShowTable() error
+
+	// CreateCommentForm displays interactive prompts for entering comment text and selecting a category.
+	// It creates a text input prompt for the comment and a selection menu for the category
+	// (Positif, Netral, Negatif) with custom styling. The user's inputs are stored in the provided
+	// string pointers.
+	CreateCommentForm(komentar, kategori *string) error
+
+	// EditForm displays interactive prompts for editing comment text and selecting a category.
+	// It creates a text input prompt for the comment and a selection menu for the category
+	// (Positif, Netral, Negatif) with custom styling. The user's inputs are stored in the provided
+	// string pointers.
+	EditForm(komentar, kategori *string) error
+
+	// EditComment updates a comment with the specified ID in the repository.
+	// It delegates the update operation to the underlying repository implementation.
+	EditComment(id int, komentar model.Comment) error
 }
 
-// komentarService implements the KomentarService interface.
+// commentService implements the commentService interface.
 // It acts as a service layer between the application and the repository.
 type commentService struct {
 	commentRepo repository.CommentRepository
@@ -76,7 +98,7 @@ func NewCommentService(commentRepo repository.CommentRepository) CommentService 
 
 // CreateCommentPage displays a form for creating a new comment and processes the user's input.
 // It clears the screen, shows a header for the comment input form, then prompts the user
-// to enter comment text and select a category through the createCommentForm function.
+// to enter comment text and select a category through the CreateCommentForm function.
 // Upon successful input, it creates a new comment in the system with the provided information.
 //
 // Parameters:
@@ -93,7 +115,7 @@ func (c *commentService) CreateCommentPage(user model.User) error {
 
 	var komentar, kategori string
 
-	err := createCommentForm(&komentar, &kategori)
+	err := c.CreateCommentForm(&komentar, &kategori)
 	if err != nil {
 		return err
 	}
@@ -109,7 +131,7 @@ func (c *commentService) CreateCommentPage(user model.User) error {
 	return nil
 }
 
-// createCommentForm displays interactive prompts for entering comment text and selecting a category.
+// CreateCommentForm displays interactive prompts for entering comment text and selecting a category.
 // It creates a text input prompt for the comment and a selection menu for the category
 // (Positif, Netral, Negatif) with custom styling. The user's inputs are stored in the provided
 // string pointers.
@@ -120,7 +142,7 @@ func (c *commentService) CreateCommentPage(user model.User) error {
 //
 // Returns:
 //   - error: An error if any prompt operation fails, nil on success
-func createCommentForm(komentar, kategori *string) error {
+func (c *commentService) CreateCommentForm(komentar, kategori *string) error {
 	komentarPrompt := promptui.Prompt{Label: "Komentar"}
 	kategoriPrompt := promptui.Select{
 		Label: "Kategori",
@@ -168,7 +190,7 @@ func (c *commentService) ShowComment(chose *string) error {
 	color.Yellow("=           LIHAT KOMENTAR             =")
 	color.Yellow("========================================")
 
-	err := c.showTable()
+	err := c.ShowTable()
 	if err != nil {
 		return err
 	}
@@ -492,7 +514,7 @@ func (c *commentService) EditUserComment(user model.User) error {
 	}
 
 	var komentar, kategori string
-	err = editForm(&komentar, &kategori)
+	err = c.EditForm(&komentar, &kategori)
 	if err != nil {
 		return err
 	}
@@ -521,7 +543,7 @@ func (c *commentService) EditUserComment(user model.User) error {
 	return nil
 }
 
-// editForm displays interactive prompts for editing comment text and selecting a category.
+// EditForm displays interactive prompts for editing comment text and selecting a category.
 // It creates a text input prompt for the comment and a selection menu for the category
 // (Positif, Netral, Negatif) with custom styling. The user's inputs are stored in the provided
 // string pointers.
@@ -532,7 +554,7 @@ func (c *commentService) EditUserComment(user model.User) error {
 //
 // Returns:
 //   - error: An error if any prompt operation fails, nil on success
-func editForm(komentar, kategori *string) error {
+func (c *commentService) EditForm(komentar, kategori *string) error {
 	komentarPrompt := promptui.Prompt{Label: "Komentar"}
 	kategoriPrompt := promptui.Select{
 		Label: "Kategori",
@@ -693,7 +715,7 @@ func (*commentService) CommentShowPage(chose *string) error {
 	return nil
 }
 
-// showTable retrieves and displays all comments in a formatted table.
+// ShowTable retrieves and displays all comments in a formatted table.
 // It creates a table with columns for comment number, text content, and category.
 // The function queries the repository for all comments, adds each comment
 // to the table (up to the global.CommentCount limit), and renders the table
@@ -701,12 +723,12 @@ func (*commentService) CommentShowPage(chose *string) error {
 //
 // Returns:
 //   - error: An error if retrieving comments fails, nil on success
-func (c *commentService) showTable() error {
+func (c *commentService) ShowTable() error {
 	var comments [255]model.Comment
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"#", "Komentar", "Kategori"})
+	t.AppendHeader(table.Row{"#", "Id", "Komentar", "Kategori"})
 
 	err := c.commentRepo.GetAllComments(&comments)
 	if err != nil {
@@ -716,6 +738,7 @@ func (c *commentService) showTable() error {
 	for i := 0; i < global.CommentCount; i++ {
 		t.AppendRow(table.Row{
 			i + 1,
+			comments[i].Id,
 			comments[i].Komentar,
 			comments[i].Kategori,
 		})
@@ -762,6 +785,25 @@ func (c *commentService) showCommentByUserTable(userId int) error {
 	}
 	t.SetStyle(table.StyleColoredBright)
 	t.Render()
+
+	return nil
+}
+
+// EditComment updates a comment with the specified ID in the system.
+// It delegates to the underlying repository implementation to perform the actual update.
+// Only non-empty fields in the provided comment model will be updated.
+//
+// Parameters:
+//   - id: The ID of the comment to edit
+//   - komentar: The model.Comment containing fields to update
+//
+// Returns:
+//   - error: An error if the comment is not found or update fails, nil on success
+func (c *commentService) EditComment(id int, komentar model.Comment) error {
+	err := c.commentRepo.EditComment(id, komentar)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
