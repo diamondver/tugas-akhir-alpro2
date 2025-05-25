@@ -23,7 +23,7 @@ type UserService interface {
 
 	// IsUserExists checks if a user with the specified username exists.
 	// Returns true if a user with the given username exists, false otherwise.
-	IsUserExists(username string) bool
+	IsUserExists(username string, exceptId int) bool
 
 	// UserPage displays the user menu interface and captures the user's selection.
 	// It presents a menu with options for comment management (add/view/edit/delete)
