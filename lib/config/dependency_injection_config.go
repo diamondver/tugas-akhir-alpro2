@@ -14,6 +14,7 @@ type AppContainer struct {
 	AuthController    *controllers.AuthController
 	UserController    *controllers.UserController
 	CommentController *controllers.CommentController
+	AdminController   *controllers.AdminController
 }
 
 // DependencyConfig initializes and wires all application dependencies.
@@ -31,10 +32,14 @@ func DependencyConfig() *AppContainer {
 	userController := controllers.NewUserController(userService)
 	commentController := controllers.NewCommentController(commentService)
 
+	adminService := services.NewAdminService(userService)
+	adminController := controllers.NewAdminController(adminService)
+
 	return &AppContainer{
 		MainController:    mainController,
 		AuthController:    authController,
 		UserController:    userController,
 		CommentController: commentController,
+		AdminController: adminController,
 	}
 }

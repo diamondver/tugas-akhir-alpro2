@@ -59,6 +59,8 @@ func Bootstrap() {
 			}
 		case "Register":
 			container.AuthController.Register()
+		case "Admin":
+			container.AdminController.AdminMenu()
 		}
 	}
 
