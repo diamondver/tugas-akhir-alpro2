@@ -1270,19 +1270,19 @@ func (a *adminService) Grafik() error {
 	color.Cyan("Jumlah User: %d", global.UserCount)
 	color.Cyan("Jumlah Komentar: %d", global.CommentCount)
 
-	positif, err := a.commentRepo.GetCommentByKategori("positif", &comments)
+	positif, err := a.commentRepo.GetCommentByKategori("Positif", &comments)
 	if err != nil {
 		return err
 	}
 	color.Cyan("Jumlah Komentar Positif: %d", positif)
 
-	netral, err := a.commentRepo.GetCommentByKategori("netral", &comments)
+	netral, err := a.commentRepo.GetCommentByKategori("Netral", &comments)
 	if err != nil {
 		return err
 	}
 	color.Cyan("Jumlah Komentar Netral: %d", netral)
 
-	negatif, err := a.commentRepo.GetCommentByKategori("negatif", &comments)
+	negatif, err := a.commentRepo.GetCommentByKategori("Negatif", &comments)
 	if err != nil {
 		return err
 	}
