@@ -10,8 +10,9 @@ import (
 // their required dependencies. It serves as a central access point for all
 // properly configured controllers in the application.
 type AppContainer struct {
-	MainController *controllers.MainController
-	AuthController *controllers.AuthController
+	MainController  *controllers.MainController
+	AuthController  *controllers.AuthController
+	AdminController *controllers.AdminController
 }
 
 // DependencyConfig initializes and wires all application dependencies.
@@ -27,8 +28,12 @@ func DependencyConfig() *AppContainer {
 	authService := services.NewAuthService(userService)
 	authController := controllers.NewAuthController(authService)
 
+	adminService := services.NewAdminService(userService)
+	adminController := controllers.NewAdminController(adminService)
+
 	return &AppContainer{
-		MainController: mainController,
-		AuthController: authController,
+		MainController:  mainController,
+		AuthController:  authController,
+		AdminController: adminController,
 	}
 }

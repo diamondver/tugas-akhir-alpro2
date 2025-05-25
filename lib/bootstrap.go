@@ -35,6 +35,8 @@ func Bootstrap() {
 			container.AuthController.Login(&user)
 		case "Register":
 			container.AuthController.Register()
+		case "Admin":
+			container.AdminController.AdminMenu()
 		}
 	}
 
