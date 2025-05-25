@@ -57,16 +57,6 @@ func (c *AuthController) Login(user *model.User) {
 // Returns:
 //   - None, but prompts for user input and handles errors internally
 func (c *AuthController) Register() {
-	//err := c.authService.Register()
-	//if err != nil {
-	//	color.Red(err.Error())
-	//	fmt.Scanln()
-	//	return
-	//}
-	//
-	//color.Green("Registration successful! Please login to continue.")
-	//fmt.Scanln()
-
 	for {
 		err := c.authService.Register()
 		if err != nil {
